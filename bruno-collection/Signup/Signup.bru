@@ -1,0 +1,50 @@
+meta {
+  name: Signup
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/signup
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "emailAddress": "test+{{$timestamp}}@example.com",
+    "firstName": "Complete",
+    "lastName": "Signup",
+    "dateOfBirth": "1992-03-15",
+    "marketingConsent": true,
+    "selectedLists": ["london", "birmingham"],
+    "message": "I'm interested in learning more about your services in London and Birmingham."
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 201 && res.getBody().success) {
+    const responseData = res.getBody().data;
+
+    if (responseData.subscriber) {
+      bru.setEnvVar("last_subscriber_id", responseData.subscriber.id);
+      bru.setEnvVar("last_signup_email", responseData.subscriber.emailAddress);
+    }
+
+    if (responseData.enquiry) {
+      bru.setEnvVar("last_enquiry_id", responseData.enquiry.id);
+    }
+
+  } else if (res.getStatus() >= 400) {
+    const errorBody = res.getBody();
+
+    bru.setEnvVar("last_subscriber_id", null);
+    bru.setEnvVar("last_enquiry_id", null);
+    bru.setEnvVar("last_signup_email", null);
+  }
+}

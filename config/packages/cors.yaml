@@ -1,0 +1,25 @@
+framework:
+    http_method_override: true
+    serializer:
+        enabled: true
+
+# CORS Configuration for JavaScript/Browser Consumption
+# This configuration allows the REST API to be consumed by web browsers
+
+# Note: In production, you should restrict origins to specific domains
+# and configure appropriate security headers
+
+# Example configuration for when a CORS bundle is added:
+# cors:
+#     allow_credentials: false
+#     allow_origin: ['*']  # In production, replace with specific domains
+#     allow_headers: ['*']
+#     allow_methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+#     expose_headers: ['X-Total-Count', 'X-Page-Count']
+#     max_age: 3600
+
+# For now, we'll configure basic headers in the controllers
+# To properly enable CORS, install the NelmioCorsBundle:
+# composer require nelmio/cors-bundle
+
+# Then uncomment and configure the above CORS settings

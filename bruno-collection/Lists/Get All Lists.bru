@@ -1,0 +1,16 @@
+meta {
+  name: Get All Lists
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/lists
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}

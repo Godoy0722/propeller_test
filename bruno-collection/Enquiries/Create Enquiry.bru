@@ -1,0 +1,33 @@
+meta {
+  name: Create Enquiry
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/enquiries
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "subscriberId": "{{last_subscriber_id}}",
+    "message": "This is a follow-up enquiry using the subscriber ID extracted from the signup process."
+  }
+}
+
+script:post-response {
+  if (res.getStatus() === 201 && res.getBody().success) {
+    const responseData = res.getBody().data;
+  
+    if (responseData.enquiry) {
+      bru.setEnvVar("last_enquiry_id", responseData.enquiry.id);
+    }
+  }
+}

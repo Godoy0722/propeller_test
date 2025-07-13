@@ -1,0 +1,149 @@
+# Security Headers Configuration
+# This configuration enhances API security with proper HTTP headers
+
+framework:
+    # Enable HTTP security headers
+    http_client:
+        default_options:
+            headers:
+                'X-Content-Type-Options': 'nosniff'
+                'X-Frame-Options': 'DENY'
+                'X-XSS-Protection': '1; mode=block'
+
+# Security Headers Service Configuration
+# These will be applied via a response listener
+
+parameters:
+    # Security header values
+    security_headers:
+        # Prevent MIME type sniffing
+        x_content_type_options: 'nosniff'
+
+        # Prevent embedding in iframes
+        x_frame_options: 'DENY'
+
+        # Enable XSS protection
+        x_xss_protection: '1; mode=block'
+
+        # Referrer policy for privacy
+        referrer_policy: 'strict-origin-when-cross-origin'
+
+        # Content Security Policy for API
+        content_security_policy: >
+            default-src 'none';
+            script-src 'none';
+            style-src 'none';
+            img-src 'none';
+            connect-src 'self';
+            font-src 'none';
+            object-src 'none';
+            media-src 'none';
+            frame-src 'none';
+            child-src 'none';
+            worker-src 'none';
+            manifest-src 'none';
+            base-uri 'none';
+            form-action 'none';
+            frame-ancestors 'none';
+            block-all-mixed-content;
+            upgrade-insecure-requests
+
+        # HSTS (HTTPS only - enable in production)
+        strict_transport_security: 'max-age=31536000; includeSubDomains; preload'
+
+        # Permissions Policy (Feature Policy)
+        permissions_policy: >
+            accelerometer=(),
+            ambient-light-sensor=(),
+            autoplay=(),
+            battery=(),
+            camera=(),
+            cross-origin-isolated=(),
+            display-capture=(),
+            document-domain=(),
+            encrypted-media=(),
+            execution-while-not-rendered=(),
+            execution-while-out-of-viewport=(),
+            fullscreen=(),
+            geolocation=(),
+            gyroscope=(),
+            keyboard-map=(),
+            magnetometer=(),
+            microphone=(),
+            midi=(),
+            navigation-override=(),
+            payment=(),
+            picture-in-picture=(),
+            publickey-credentials-get=(),
+            screen-wake-lock=(),
+            sync-xhr=(),
+            usb=(),
+            web-share=(),
+            xr-spatial-tracking=()
+
+    # Rate limiting configuration
+    rate_limiting:
+        # General API rate limits
+        default_limit: 100  # requests per minute
+        burst_limit: 20     # burst requests
+
+        # Specific endpoint limits
+        signup_limit: 10    # signup requests per minute per IP
+        validation_limit: 50 # validation requests per minute per IP
+
+        # Time windows
+        time_window: 60     # seconds
+        block_duration: 300 # seconds (5 minutes)
+
+    # Input validation settings
+    input_validation:
+        max_request_size: 1048576  # 1MB in bytes
+        max_json_depth: 10
+        max_array_items: 100
+        sanitize_html: true
+
+        # Content filtering
+        blocked_patterns:
+            - '<script'
+            - 'javascript:'
+            - 'data:text/html'
+            - 'vbscript:'
+            - 'onload='
+            - 'onerror='
+
+# Development vs Production configuration
+when@dev:
+    parameters:
+        security_headers:
+            # Relaxed CSP for development
+            content_security_policy: >
+                default-src 'self';
+                script-src 'self' 'unsafe-inline' 'unsafe-eval';
+                style-src 'self' 'unsafe-inline';
+                img-src 'self' data:;
+                connect-src 'self';
+                font-src 'self';
+                frame-ancestors 'none'
+
+            # No HSTS in development
+            strict_transport_security: null
+
+when@prod:
+    parameters:
+        security_headers:
+            # Strict CSP for production
+            content_security_policy: >
+                default-src 'none';
+                connect-src 'self';
+                frame-ancestors 'none';
+                block-all-mixed-content;
+                upgrade-insecure-requests
+
+            # Enable HSTS in production
+            strict_transport_security: 'max-age=31536000; includeSubDomains; preload'
+
+        rate_limiting:
+            # Stricter limits in production
+            default_limit: 60
+            signup_limit: 5
+            validation_limit: 30

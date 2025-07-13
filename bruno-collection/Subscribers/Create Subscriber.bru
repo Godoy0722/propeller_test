@@ -1,0 +1,30 @@
+meta {
+  name: Create Subscriber
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/subscribers
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    // Using the timestamp to always have an unique email for testing purposes.
+    "emailAddress": "test+{{$timestamp}}@example.com",
+    "firstName": "{{exampleFirstName}}",
+    "lastName": "{{exampleLastName}}",
+    // "dateOfBirth": "2022-01-01", // You can test the age validation too
+    "dateOfBirth": "1990-01-01",
+    //"marketingConsent": false, // You can also test without marketing consent
+    "marketingConsent": true,
+    "lists": ["01JZWVKXT3CS62RVWR8X4WR55Q", "01JZWVKXT3CS62RVWR8X4WR55R"]
+  }
+}
